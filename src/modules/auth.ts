@@ -1,20 +1,47 @@
-const {
-    exchangeNpssoForAccessCode,
-    exchangeAccessCodeForAuthTokens,
-    exchangeRefreshTokenForAuthTokens
-} = await import("psn-api")
+import {getUserInfo, UserTQ} from "./psn-user.js";
+import {Params} from "./utils/params.js";
 
-export type Auth = {
+export type AuthTokens = {
     accessToken: string;
     refreshToken: string;
 };
 
-export async function authRefresh(authRefreshToken: string) {
-    return exchangeRefreshTokenForAuthTokens(authRefreshToken);
+export type AuthData = {
+    tokens: AuthTokens;
+    userInfo: UserTQ;
+    accountId: string;
 }
 
-export async function authFromNpsso(npsso: string) {
+export async function auth(params: Params): Promise<AuthData> {
+    let authTokensResponse = await authFromNpsso(params.npsso);
+    if (authTokensResponse.error) {
+        console.error("Error in auth");
+        console.error(authTokensResponse.error);
+    }
+
+    let accountId: string;
+    let userInfo: UserTQ;
+    if (!params.profileName) {
+        console.info("No PROFILE_NAME provided, use 'me' as account");
+        accountId = "me"
+        userInfo = await getUserInfo(authTokensResponse, accountId);
+    } else {
+        userInfo = await getUserInfo(authTokensResponse, params.profileName);
+        accountId = userInfo.psnId;
+        console.info(`Found user ${params.profileName} in PSN (id: ${accountId})`);
+    }
+
+    return {
+        tokens: authTokensResponse,
+        userInfo: userInfo,
+        accountId: accountId,
+    }
+}
+
+
+async function authFromNpsso(npsso: string) {
+    //@ts-ignore
+    const {exchangeNpssoForAccessCode, exchangeAccessCodeForAuthTokens} = await import("psn-api");
     const accessCode = await exchangeNpssoForAccessCode(npsso);
-    const auth = await exchangeAccessCodeForAuthTokens(accessCode);
-    return auth;
+    return await exchangeAccessCodeForAuthTokens(accessCode);
 }
