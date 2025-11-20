@@ -1,15 +1,18 @@
 import {auth, AuthData} from "./modules/auth.js";
-import {getParams, Params} from "./modules/utils/params.js";
+import {getParams, Params} from "./modules/params.js";
 import {getTitlesData, PsnTitlesTrophySetResponseDTO} from "./modules/psn-titles-trophy-sets.js";
 import {insertUserIntoPostgres} from "./modules/postgres/insert-user.js";
 import {insertTitlesIntoPostgres, insertUserTitlesIntoPostgres} from "./modules/postgres/insert-titles.js";
-import {insertTitlesTrophySetIntoPostgres, insertTrophySetsIntoPostgres} from "./modules/postgres/insert-trophy-sets.js";
+import {
+    insertTitlesTrophySetIntoPostgres,
+    insertTrophySetsIntoPostgres
+} from "./modules/postgres/insert-trophy-sets.js";
 import {getTrophiesData, TrophyResponseDTO} from "./modules/psn-trophy.js";
 import {insertEarnedTrophiesIntoPostgres, insertTrophiesIntoPostgres} from "./modules/postgres/insert-trophies.js";
 
 
 async function main() {
-    console.info("Start PSN Fetcher v2")
+    console.info("START PSN Fetcher v2")
 
     const params: Params = getParams();
 
@@ -33,7 +36,7 @@ async function main() {
     await insertTrophiesIntoPostgres(trophyResponseDTO.trophies, params);
     await insertEarnedTrophiesIntoPostgres(trophyResponseDTO.earnedTrophies, params);
 
-    console.info("End PSN Fetcher");
+    console.info("SUCCESS");
     process.exit(0);
 }
 

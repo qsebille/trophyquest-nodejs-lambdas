@@ -1,9 +1,10 @@
 import {TitleTrophySetDTO, TrophySetDTO} from "../psn-titles-trophy-sets.js";
-import {Params} from "../utils/params.js";
-import {buildInsertPlaceholders, postgresUtils} from "./postgres-utils.js";
+import {Params} from "../params.js";
+import {buildPsnFetcherPool} from "./pool.js";
+import {buildInsertPlaceholders} from "./postgres-utils.js";
 
 export async function insertTrophySetsIntoPostgres(trophySetList: TrophySetDTO[], params: Params): Promise<any> {
-    const pool = postgresUtils(params);
+    const pool = buildPsnFetcherPool(params);
     const values: string[] = [];
     const placeholders: string = trophySetList.map((ts, idx) => {
         const currentValues = [ts.id, ts.name, ts.platform, ts.version, ts.serviceName, ts.iconUrl];
@@ -13,7 +14,9 @@ export async function insertTrophySetsIntoPostgres(trophySetList: TrophySetDTO[]
 
     const insert = await pool.query(`
         INSERT INTO psn.trophy_set (id, name, platform, version, service_name, icon_url)
-        VALUES ${placeholders} ON CONFLICT (id) DO NOTHING
+        VALUES
+        ${placeholders} ON CONFLICT (id)
+        DO NOTHING
     `, values);
 
     const nbInserted = insert.rowCount;
@@ -23,7 +26,7 @@ export async function insertTrophySetsIntoPostgres(trophySetList: TrophySetDTO[]
 
 
 export async function insertTitlesTrophySetIntoPostgres(joinList: TitleTrophySetDTO[], params: Params): Promise<any> {
-    const pool = postgresUtils(params);
+    const pool = buildPsnFetcherPool(params);
     const values: string[] = [];
     const placeholders: string = joinList.map((link, idx) => {
         const currentValues = [link.titleId, link.trophySetId];
@@ -33,7 +36,9 @@ export async function insertTitlesTrophySetIntoPostgres(joinList: TitleTrophySet
 
     const insert = await pool.query(`
         INSERT INTO psn.title_trophy_set (title_id, trophy_set_id)
-        VALUES ${placeholders} ON CONFLICT (title_id,trophy_set_id) DO NOTHING
+        VALUES
+        ${placeholders} ON CONFLICT (title_id,trophy_set_id)
+        DO NOTHING
     `, values);
 
     const nbInserted = insert.rowCount;

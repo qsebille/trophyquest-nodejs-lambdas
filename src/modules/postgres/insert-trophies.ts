@@ -1,11 +1,12 @@
-import {Params} from "../utils/params.js";
-import {buildInsertPlaceholders, postgresUtils} from "./postgres-utils.js";
+import {Params} from "../params.js";
+import {buildPsnFetcherPool} from "./pool.js";
 import {EarnedTrophyDTO, TrophyDTO} from "../psn-trophy.js";
+import {buildInsertPlaceholders} from "./postgres-utils.js";
 
 const TROPHY_BATCH_SIZE: number = 200;
 
 export async function insertTrophiesIntoPostgres(trophies: TrophyDTO[], params: Params): Promise<any> {
-    const pool = postgresUtils(params);
+    const pool = buildPsnFetcherPool(params);
     let nbIgnored: number = 0;
     let nbInserted: number = 0;
 
@@ -30,8 +31,10 @@ export async function insertTrophiesIntoPostgres(trophies: TrophyDTO[], params: 
 
         const insert = await pool.query(`
             INSERT INTO psn.trophy (id, trophy_set_id, rank, title, detail, is_hidden, trophy_type, icon_url,
-                                           game_group_id)
-            VALUES ${placeholders} ON CONFLICT (id) DO NOTHING
+                                    game_group_id)
+            VALUES
+            ${placeholders} ON CONFLICT (id)
+            DO NOTHING
         `, values);
 
         nbInserted += insert.rowCount ?? 0;
@@ -42,7 +45,7 @@ export async function insertTrophiesIntoPostgres(trophies: TrophyDTO[], params: 
 }
 
 export async function insertEarnedTrophiesIntoPostgres(earnedTrophies: EarnedTrophyDTO[], params: Params): Promise<any> {
-    const pool = postgresUtils(params);
+    const pool = buildPsnFetcherPool(params);
     let nbIgnored: number = 0;
     let nbInserted: number = 0;
 
@@ -61,7 +64,9 @@ export async function insertEarnedTrophiesIntoPostgres(earnedTrophies: EarnedTro
 
         const insert = await pool.query(`
             INSERT INTO psn.user_earned_trophy (trophy_id, user_id, earned_at)
-            VALUES ${placeholders} ON CONFLICT (trophy_id,user_id) DO NOTHING
+            VALUES
+            ${placeholders} ON CONFLICT (trophy_id,user_id)
+            DO NOTHING
         `, values);
 
         nbInserted += insert.rowCount ?? 0;

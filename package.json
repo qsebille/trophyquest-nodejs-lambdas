@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start": "tsx src/psn-api-main.ts"
+    "start-fetcher": "tsx src/psn-fetcher-main.ts",
+    "start-transformer": "tsx src/psn-transformer-main.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

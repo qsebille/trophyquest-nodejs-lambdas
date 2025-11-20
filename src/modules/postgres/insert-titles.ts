@@ -1,11 +1,12 @@
 import {TitleDTO} from "../psn-titles-trophy-sets.js";
-import {Params} from "../utils/params.js";
-import {buildInsertPlaceholders, postgresUtils} from "./postgres-utils.js";
+import {Params} from "../params.js";
 import {AuthData} from "../auth.js";
+import {buildInsertPlaceholders} from "./postgres-utils.js";
+import {buildPsnFetcherPool} from "./pool.js";
 
 
 export async function insertTitlesIntoPostgres(titles: TitleDTO[], params: Params): Promise<any> {
-    const pool = postgresUtils(params);
+    const pool = buildPsnFetcherPool(params);
     const values: string[] = [];
     const placeholders: string = titles.map((t, idx) => {
         const currentValues = [t.id, t.name, t.category, t.imageUrl];
@@ -13,9 +14,11 @@ export async function insertTitlesIntoPostgres(titles: TitleDTO[], params: Param
         return buildInsertPlaceholders(currentValues, idx);
     }).join(',');
 
-    const insert =  await pool.query(`
+    const insert = await pool.query(`
         INSERT INTO psn.title (id, name, category, image_url)
-        VALUES ${placeholders} ON CONFLICT (id) DO NOTHING
+        VALUES
+        ${placeholders} ON CONFLICT (id)
+        DO NOTHING
     `, values);
 
     const nbInserted = insert.rowCount;
@@ -24,7 +27,7 @@ export async function insertTitlesIntoPostgres(titles: TitleDTO[], params: Param
 }
 
 export async function insertUserTitlesIntoPostgres(authData: AuthData, titles: TitleDTO[], params: Params): Promise<any> {
-    const pool = postgresUtils(params);
+    const pool = buildPsnFetcherPool(params);
     const values: string[] = [];
     const placeholders: string = titles.map((title, idx) => {
         const currentValues = [authData.userInfo.id, title.id, title.lastPlayedDateTime];
@@ -32,9 +35,11 @@ export async function insertUserTitlesIntoPostgres(authData: AuthData, titles: T
         return buildInsertPlaceholders(currentValues, idx);
     }).join(',');
 
-    const insert =  await pool.query(`
+    const insert = await pool.query(`
         INSERT INTO psn.user_played_title (user_id, title_id, last_played_at)
-        VALUES ${placeholders} ON CONFLICT (user_id,title_id) DO
+        VALUES
+        ${placeholders} ON CONFLICT (user_id,title_id)
+        DO
         UPDATE SET last_played_at=EXCLUDED.last_played_at
     `, values);
 

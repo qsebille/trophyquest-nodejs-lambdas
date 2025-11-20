@@ -1,5 +1,5 @@
 import {getUserInfo, UserDTO} from "./psn-user.js";
-import {Params} from "./utils/params.js";
+import {Params} from "./params.js";
 
 export type AuthTokens = {
     accessToken: string;
