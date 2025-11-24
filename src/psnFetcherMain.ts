@@ -12,18 +12,24 @@ import {fetchPsnTitlesTrophySet} from "./psn/fetchPsnTitlesTrophySet.js";
 import {PsnTitleTrophySet} from "./psn/models/psnTitleTrophySet.js";
 import {fetchPsnUserTrophies} from "./psn/fetchPsnTrophies.js";
 import {insertTitlesIntoPostgres} from "./postgres/insertTitlesIntoPostgres.js";
-import {insertUserTitlesIntoPostgres} from "./postgres/insertUserTitlesIntoPostgres.js";
+import {insertUserPlayedTitlesIntoPostgres} from "./postgres/insertUserPlayedTitlesIntoPostgres.js";
 import {insertTrophySetsIntoPostgres} from "./postgres/insertTrophySetsIntoPostgres.js";
 import {insertTitlesTrophySetIntoPostgres} from "./postgres/insertTitlesTrophySetIntoPostgres.js";
-import {insertUserIntoPostgres} from "./postgres/insertUserIntoPostgres.js";
+import {upsertUserProfileIntoPostgres} from "./postgres/upsertUserProfileIntoPostgres.js";
 import {PsnTrophyResponse} from "./psn/models/psnTrophyResponse.js";
 import {insertTrophiesIntoPostgres} from "./postgres/insertTrophiesIntoPostgres.js";
 import {insertEarnedTrophiesIntoPostgres} from "./postgres/insertEarnedTrophiesIntoPostgres.js";
 
 
+/**
+ * Main method that coordinates the fetching, processing, and storing of PlayStation Network (PSN) user data, including titles, trophy sets, trophies, and earned trophies.
+ * It authenticates the user, retrieves data from the PSN API, and inserts the processed data into a PostgreSQL database.
+ *
+ * @return {Promise<void>} A promise that resolves when the entire process is completed successfully, or rejects if any errors occur during execution.
+ */
 async function main() {
     const startTime = Date.now();
-    console.info("START PSN Fetcher v2")
+    console.info("START PSN Fetcher")
 
     const params: Params = getParams();
     const pool: Pool = buildPostgresPool();
@@ -48,9 +54,9 @@ async function main() {
         console.info(`Found ${trophyResponseDTO.earnedTrophies.length} earned trophies`);
 
         // Insertion into postgres database
-        await insertUserIntoPostgres(pool, psnUser);
+        await upsertUserProfileIntoPostgres(pool, psnUser);
         await insertTitlesIntoPostgres(pool, titles);
-        await insertUserTitlesIntoPostgres(pool, psnUser, titles);
+        await insertUserPlayedTitlesIntoPostgres(pool, psnUser, titles);
         await insertTrophySetsIntoPostgres(pool, trophySets);
         await insertTitlesTrophySetIntoPostgres(pool, titleTrophySets);
         await insertTrophiesIntoPostgres(pool, trophyResponseDTO.trophies);
