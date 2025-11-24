@@ -26,9 +26,14 @@ export async function fetchPsnTitlesTrophySet(
     const trophySetIds: string[] = trophySets.map(t => t.id);
     const titleIds: string[] = titles.map(t => t.id);
     let result: PsnTitleTrophySet[] = [];
-    for (let i = 0; i <= titleIds.length; i += TITLE_CHUNK_SIZE) {
+    for (let i = 0; i < titleIds.length; i += TITLE_CHUNK_SIZE) {
         const chunk: string[] = titleIds.slice(i, i + TITLE_CHUNK_SIZE);
-        const options = {npTitleIds: chunk.join(",")}
+
+        if (chunk.length === 0) {
+            continue;
+        }
+
+        const options = {npTitleIds: chunk.join(",")};
         const trophySetResponse = await getUserTrophiesForSpecificTitle(psnAuthTokens, accountId, options);
 
         for (const title of trophySetResponse.titles) {
