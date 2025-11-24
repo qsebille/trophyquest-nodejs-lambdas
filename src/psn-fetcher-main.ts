@@ -9,38 +9,44 @@ import {
 } from "./modules/postgres/insert-trophy-sets.js";
 import {getTrophiesData, TrophyResponseDTO} from "./modules/psn-trophy.js";
 import {insertEarnedTrophiesIntoPostgres, insertTrophiesIntoPostgres} from "./modules/postgres/insert-trophies.js";
+import {buildPsnFetcherPool} from "./modules/postgres/pool.js";
+import {Pool} from "pg";
 
 
 async function main() {
     console.info("START PSN Fetcher v2")
 
     const params: Params = getParams();
+    const pool: Pool = buildPsnFetcherPool(params);
 
-    // Authenticate and add profile in database
-    let authData: AuthData = await auth(params);
-    await insertUserIntoPostgres(authData.userInfo, params);
+    try {
+        // Authenticate and add profile in database
+        let authData: AuthData = await auth(params);
+        await insertUserIntoPostgres(pool, authData.userInfo);
 
-    // Fetch titles and trophy sets
-    const titlesResponseDTO: PsnTitlesTrophySetResponseDTO = await getTitlesData(authData);
-    console.info(`Found ${titlesResponseDTO.titles.length} titles`);
-    console.info(`Found ${titlesResponseDTO.trophySets.length} trophy sets`);
-    await insertTitlesIntoPostgres(titlesResponseDTO.titles, params);
-    await insertUserTitlesIntoPostgres(authData, titlesResponseDTO.titles, params);
-    await insertTrophySetsIntoPostgres(titlesResponseDTO.trophySets, params);
-    await insertTitlesTrophySetIntoPostgres(titlesResponseDTO.links, params);
+        // Fetch titles and trophy sets
+        const titlesResponseDTO: PsnTitlesTrophySetResponseDTO = await getTitlesData(authData);
+        console.info(`Found ${titlesResponseDTO.titles.length} titles`);
+        console.info(`Found ${titlesResponseDTO.trophySets.length} trophy sets`);
+        await insertTitlesIntoPostgres(pool, titlesResponseDTO.titles);
+        await insertUserTitlesIntoPostgres(pool, authData, titlesResponseDTO.titles);
+        await insertTrophySetsIntoPostgres(pool, titlesResponseDTO.trophySets);
+        await insertTitlesTrophySetIntoPostgres(pool, titlesResponseDTO.links);
 
-    // Fetch trophies for each title
-    const trophyResponseDTO: TrophyResponseDTO = await getTrophiesData(authData, titlesResponseDTO.trophySets);
-    console.info(`Found ${trophyResponseDTO.trophies.length} trophies`);
-    console.info(`Found ${trophyResponseDTO.earnedTrophies.length} earned trophies`);
-    await insertTrophiesIntoPostgres(trophyResponseDTO.trophies, params);
-    await insertEarnedTrophiesIntoPostgres(trophyResponseDTO.earnedTrophies, params);
+        // Fetch trophies for each title
+        const trophyResponseDTO: TrophyResponseDTO = await getTrophiesData(authData, titlesResponseDTO.trophySets);
+        console.info(`Found ${trophyResponseDTO.trophies.length} trophies`);
+        console.info(`Found ${trophyResponseDTO.earnedTrophies.length} earned trophies`);
+        await insertTrophiesIntoPostgres(pool, trophyResponseDTO.trophies);
+        await insertEarnedTrophiesIntoPostgres(pool, trophyResponseDTO.earnedTrophies);
 
-    console.info("SUCCESS");
-    process.exit(0);
+        console.info("SUCCESS");
+    } finally {
+        await pool.end();
+    }
 }
 
 main().catch((e) => {
     console.error(e);
-    process.exit(1);
+    process.exitCode = 1;
 });

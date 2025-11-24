@@ -1,12 +1,10 @@
-import {Params} from "../params.js";
-import {buildPsnFetcherPool} from "./pool.js";
+import {Pool} from "pg";
 import {EarnedTrophyDTO, TrophyDTO} from "../psn-trophy.js";
 import {buildInsertPlaceholders} from "./postgres-utils.js";
 
 const TROPHY_BATCH_SIZE: number = 200;
 
-export async function insertTrophiesIntoPostgres(trophies: TrophyDTO[], params: Params): Promise<any> {
-    const pool = buildPsnFetcherPool(params);
+export async function insertTrophiesIntoPostgres(pool: Pool, trophies: TrophyDTO[]): Promise<any> {
     let nbIgnored: number = 0;
     let nbInserted: number = 0;
 
@@ -44,8 +42,7 @@ export async function insertTrophiesIntoPostgres(trophies: TrophyDTO[], params: 
     console.info(`Inserted ${nbInserted} trophies into postgres database ${nbIgnored > 0 ? `(${nbIgnored} ignored)` : ''}`);
 }
 
-export async function insertEarnedTrophiesIntoPostgres(earnedTrophies: EarnedTrophyDTO[], params: Params): Promise<any> {
-    const pool = buildPsnFetcherPool(params);
+export async function insertEarnedTrophiesIntoPostgres(pool: Pool, earnedTrophies: EarnedTrophyDTO[]): Promise<any> {
     let nbIgnored: number = 0;
     let nbInserted: number = 0;
 

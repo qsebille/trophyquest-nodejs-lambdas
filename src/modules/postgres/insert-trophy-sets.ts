@@ -1,10 +1,8 @@
+import {Pool} from "pg";
 import {TitleTrophySetDTO, TrophySetDTO} from "../psn-titles-trophy-sets.js";
-import {Params} from "../params.js";
-import {buildPsnFetcherPool} from "./pool.js";
 import {buildInsertPlaceholders} from "./postgres-utils.js";
 
-export async function insertTrophySetsIntoPostgres(trophySetList: TrophySetDTO[], params: Params): Promise<any> {
-    const pool = buildPsnFetcherPool(params);
+export async function insertTrophySetsIntoPostgres(pool: Pool, trophySetList: TrophySetDTO[]): Promise<any> {
     const values: string[] = [];
     const placeholders: string = trophySetList.map((ts, idx) => {
         const currentValues = [ts.id, ts.name, ts.platform, ts.version, ts.serviceName, ts.iconUrl];
@@ -25,8 +23,7 @@ export async function insertTrophySetsIntoPostgres(trophySetList: TrophySetDTO[]
 }
 
 
-export async function insertTitlesTrophySetIntoPostgres(joinList: TitleTrophySetDTO[], params: Params): Promise<any> {
-    const pool = buildPsnFetcherPool(params);
+export async function insertTitlesTrophySetIntoPostgres(pool: Pool, joinList: TitleTrophySetDTO[]): Promise<any> {
     const values: string[] = [];
     const placeholders: string = joinList.map((link, idx) => {
         const currentValues = [link.titleId, link.trophySetId];

@@ -1,12 +1,10 @@
+import {Pool} from "pg";
 import {TitleDTO} from "../psn-titles-trophy-sets.js";
-import {Params} from "../params.js";
 import {AuthData} from "../auth.js";
 import {buildInsertPlaceholders} from "./postgres-utils.js";
-import {buildPsnFetcherPool} from "./pool.js";
 
 
-export async function insertTitlesIntoPostgres(titles: TitleDTO[], params: Params): Promise<any> {
-    const pool = buildPsnFetcherPool(params);
+export async function insertTitlesIntoPostgres(pool: Pool, titles: TitleDTO[]): Promise<any> {
     const values: string[] = [];
     const placeholders: string = titles.map((t, idx) => {
         const currentValues = [t.id, t.name, t.category, t.imageUrl];
@@ -26,8 +24,7 @@ export async function insertTitlesIntoPostgres(titles: TitleDTO[], params: Param
     console.info(`Inserted ${nbInserted} titles into postgres database ${nbIgnored > 0 ? `(${nbIgnored} ignored)` : ''}`);
 }
 
-export async function insertUserTitlesIntoPostgres(authData: AuthData, titles: TitleDTO[], params: Params): Promise<any> {
-    const pool = buildPsnFetcherPool(params);
+export async function insertUserTitlesIntoPostgres(pool: Pool, authData: AuthData, titles: TitleDTO[]): Promise<any> {
     const values: string[] = [];
     const placeholders: string = titles.map((title, idx) => {
         const currentValues = [authData.userInfo.id, title.id, title.lastPlayedDateTime];

@@ -1,9 +1,7 @@
+import {Pool} from "pg";
 import {UserDTO} from "../psn-user.js";
-import {Params} from "../params.js";
-import {buildPsnFetcherPool} from "./pool.js";
 
-export async function insertUserIntoPostgres(user: UserDTO, params: Params): Promise<any> {
-    const pool = buildPsnFetcherPool(params);
+export async function insertUserIntoPostgres(pool: Pool, user: UserDTO): Promise<any> {
     const insert = await pool.query(
         `
             INSERT INTO psn.user_profile (id, name, avatar_url)
