@@ -5,6 +5,11 @@ import {buildInsertPlaceholders} from "./postgres-utils.js";
 const TROPHY_BATCH_SIZE: number = 200;
 
 export async function insertTrophiesIntoPostgres(pool: Pool, trophies: TrophyDTO[]): Promise<any> {
+    if (trophies.length === 0) {
+        console.info("No trophies to insert into postgres database.");
+        return;
+    }
+
     let nbIgnored: number = 0;
     let nbInserted: number = 0;
 
@@ -43,6 +48,11 @@ export async function insertTrophiesIntoPostgres(pool: Pool, trophies: TrophyDTO
 }
 
 export async function insertEarnedTrophiesIntoPostgres(pool: Pool, earnedTrophies: EarnedTrophyDTO[]): Promise<any> {
+    if (earnedTrophies.length === 0) {
+        console.info("No earned trophies to insert into postgres database.");
+        return;
+    }
+
     let nbIgnored: number = 0;
     let nbInserted: number = 0;
 

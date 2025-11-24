@@ -5,6 +5,11 @@ import {buildInsertPlaceholders} from "./postgres-utils.js";
 
 
 export async function insertTitlesIntoPostgres(pool: Pool, titles: TitleDTO[]): Promise<any> {
+    if (titles.length === 0) {
+        console.info("No titles to insert into postgres database.");
+        return;
+    }
+  
     const values: string[] = [];
     const placeholders: string = titles.map((t, idx) => {
         const currentValues = [t.id, t.name, t.category, t.imageUrl];
@@ -25,6 +30,11 @@ export async function insertTitlesIntoPostgres(pool: Pool, titles: TitleDTO[]): 
 }
 
 export async function insertUserTitlesIntoPostgres(pool: Pool, authData: AuthData, titles: TitleDTO[]): Promise<any> {
+    if (titles.length === 0) {
+        console.info("No user titles to insert into postgres database.");
+        return;
+    }
+
     const values: string[] = [];
     const placeholders: string = titles.map((title, idx) => {
         const currentValues = [authData.userInfo.id, title.id, title.lastPlayedDateTime];
