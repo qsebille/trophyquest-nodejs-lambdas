@@ -4,7 +4,7 @@ import {buildPostgresInsertPlaceholders} from "./utils/buildPostgresInsertPlaceh
 import {PsnTitle} from "../psn/models/psnTitle.js";
 
 /**
- * Inserts user titles into a PostgreSQL database. If a title already exists for the given user,
+ * Inserts user played titles into a PostgreSQL database. If a title already exists for the given user,
  * it updates the `last_played_at` field. Handles multiple titles in one operation.
  *
  * @param {Pool} pool - The database connection pool used to execute the query.
@@ -12,7 +12,7 @@ import {PsnTitle} from "../psn/models/psnTitle.js";
  * @param {PsnTitle[]} titles - An array of titles to insert or update in the database.
  * @return {Promise<any>} A promise that resolves when the insertion or update operation is complete.
  */
-export async function insertUserTitlesIntoPostgres(pool: Pool, psnUser: PsnUser, titles: PsnTitle[]): Promise<any> {
+export async function insertUserPlayedTitlesIntoPostgres(pool: Pool, psnUser: PsnUser, titles: PsnTitle[]): Promise<any> {
     if (titles.length === 0) {
         console.info("No user titles to insert into postgres database.");
         return;
