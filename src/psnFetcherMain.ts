@@ -46,7 +46,7 @@ async function main() {
         const trophySets: PsnTrophySet[] = await fetchPsnTrophySets(psnAuthTokens, accountId);
         console.info(`Found ${trophySets.length} trophy sets`);
         const titleTrophySets: PsnTitleTrophySet[] = await fetchPsnTitlesTrophySet(titles, trophySets, psnAuthTokens, accountId);
-        console.info(`Found ${titleTrophySets.length} titles / trophy sets links`)
+        console.info(`Found ${titleTrophySets.length} titles / trophy sets links`);
 
         // Fetch trophies for each title
         const trophyResponse: PsnTrophyResponse = await fetchPsnUserTrophies(trophySets, psnAuthTokens, accountId);

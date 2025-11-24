@@ -5,6 +5,7 @@
   "scripts": {
     "start-fetcher": "tsx src/psnFetcherMain.ts",
     "start-refresher": "tsx src/psnRefresherMain.ts",
+    "start-deleter": "tsx src/psnUserDeleter.ts",
     "test": "tsx --test"
   },
   "dependencies": {
