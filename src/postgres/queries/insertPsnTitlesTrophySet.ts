@@ -1,19 +1,20 @@
-import {Pool} from "pg";
+import {PoolClient} from "pg";
 import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
 import {PsnTitleTrophySet} from "../../psn/models/psnTitleTrophySet.js";
 import {InsertQueryResult} from "../models/insertQueryResult.js";
 
 
 /**
- * Inserts a batch of PlayStation Network (PSN) title-trophy set links into the database.
- * If a title-trophy set link already exists in the database, it will be ignored during insertion.
+ * Inserts a batch of PlayStation Network (PSN) title-to-trophy-set mappings into the database.
+ * If a mapping already exists, it will be ignored.
  *
- * @param {Pool} pool - The database connection pool used to execute the query.
- * @param {PsnTitleTrophySet[]} psnTitleTrophySets - An array of objects containing the title ID and trophy set ID pairs to insert.
- * @return {Promise<InsertQueryResult>} A promise that resolves to an object containing the count of inserted and ignored rows.
+ * @param {PoolClient} client - The database client used to execute the query.
+ * @param {PsnTitleTrophySet[]} psnTitleTrophySets - An array of objects representing the title-to-trophy-set mappings to insert.
+ * Each object should contain `titleId` and `trophySetId` properties.
+ * @return {Promise<InsertQueryResult>} An object containing the number of rows inserted (`rowsInserted`) and the number of rows ignored (`rowsIgnored`).
  */
 export async function insertPsnTitlesTrophySet(
-    pool: Pool,
+    client: PoolClient,
     psnTitleTrophySets: PsnTitleTrophySet[]
 ): Promise<InsertQueryResult> {
     if (psnTitleTrophySets.length === 0) {
@@ -31,7 +32,7 @@ export async function insertPsnTitlesTrophySet(
         return buildPostgresInsertPlaceholders(currentValues, idx);
     }).join(',');
 
-    const insert = await pool.query(`
+    const insert = await client.query(`
         INSERT INTO psn.title_trophy_set (title_id, trophy_set_id)
         VALUES
             ${placeholders} ON CONFLICT (title_id,trophy_set_id)

@@ -1,21 +1,21 @@
-import {Pool} from "pg";
+import {PoolClient} from "pg";
 import {PsnEarnedTrophy} from "../../psn/models/psnEarnedTrophy.js";
 import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
 import {InsertQueryResult} from "../models/insertQueryResult.js";
 
 
 /**
- * Inserts earned trophies into the `psn.user_earned_trophy` table in the database.
- * If a trophy already exists (based on the unique constraint), it will be ignored.
+ * Inserts earned PlayStation trophies into the database. If a trophy already exists for a user, it will be ignored.
  *
- * @param {Pool} pool - The database connection pool used to execute queries.
- * @param {PsnEarnedTrophy[]} earnedTrophies - An array of earned trophy objects to insert into the database.
- * @return {Promise<InsertQueryResult>} A Promise resolving to an object containing the count of rows inserted and ignored.
+ * @param {PoolClient} client - The PostgreSQL client used to execute the queries.
+ * @param {PsnEarnedTrophy[]} earnedTrophies - An array of earned trophies data to be inserted into the database.
+ * @return {Promise<InsertQueryResult>} A promise resolving to an object containing the number of rows inserted and ignored.
  */
 export async function insertPsnEarnedTrophies(
-    pool: Pool,
+    client: PoolClient,
     earnedTrophies: PsnEarnedTrophy[]
 ): Promise<InsertQueryResult> {
+
     if (earnedTrophies.length === 0) {
         console.info("No earned trophies to insert into postgres database.");
         return {rowsInserted: 0, rowsIgnored: 0};
@@ -41,7 +41,7 @@ export async function insertPsnEarnedTrophies(
             return buildPostgresInsertPlaceholders(currentValues, idx);
         }).join(',');
 
-        const insert = await pool.query(`
+        const insert = await client.query(`
             INSERT INTO psn.user_earned_trophy (trophy_id, user_id, earned_at)
             VALUES
                 ${placeholders} ON CONFLICT (trophy_id,user_id)

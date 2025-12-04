@@ -1,21 +1,20 @@
-import {Pool} from "pg";
+import {PoolClient} from "pg";
 import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
 import {PsnUserPlayedTitle} from "../../psn/models/psnUserPlayedTitle.js";
 import {InsertQueryResult} from "../models/insertQueryResult.js";
 
 
 /**
- * Inserts or updates PlayStation Network (PSN) user-played titles in the database.
+ * Inserts or updates a list of PlayStation user played titles into the database.
+ * If a title already exists for a user, it updates the `last_played_at` field.
+ * If it does not exist, it inserts a new record.
  *
- * If the combination of `userId` and `titleId` already exists in the database, this method updates the `lastPlayedDateTime`.
- * Otherwise, it inserts a new record. If no titles are provided, no action is performed, and the method returns early.
- *
- * @param {Pool} pool - The PostgreSQL connection pool used to execute the query.
- * @param {PsnUserPlayedTitle[]} playedTitles - An array of user-played title objects, each containing `userId`, `titleId`, and `lastPlayedDateTime`.
- * @return {Promise<InsertQueryResult>} A promise that resolves to an object containing `rowsInserted` (number of rows successfully inserted) and `rowsIgnored` (number of rows ignored, currently always 0).
+ * @param {PoolClient} client - The database client used to execute the query.
+ * @param {PsnUserPlayedTitle[]} playedTitles - An array of user played title objects, each containing `userId`, `titleId`, and `lastPlayedDateTime`.
+ * @return {Promise<InsertQueryResult>} A promise resolving to an object containing the number of rows inserted and ignored.
  */
 export async function upsertPsnUserPlayedTitles(
-    pool: Pool,
+    client: PoolClient,
     playedTitles: PsnUserPlayedTitle[]
 ): Promise<InsertQueryResult> {
     if (playedTitles.length === 0) {
@@ -33,7 +32,7 @@ export async function upsertPsnUserPlayedTitles(
         return buildPostgresInsertPlaceholders(currentValues, idx);
     }).join(',');
 
-    const insert = await pool.query(`
+    const insert = await client.query(`
         INSERT INTO psn.user_played_title (user_id, title_id, last_played_at)
         VALUES
             ${placeholders} ON CONFLICT (user_id,title_id)

@@ -4,7 +4,7 @@ import {insertPsnTrophySets} from "./queries/insertPsnTrophySets.js";
 import {insertPsnTitlesTrophySet} from "./queries/insertPsnTitlesTrophySet.js";
 import {insertPsnTrophies} from "./queries/insertPsnTrophies.js";
 import {insertPsnEarnedTrophies} from "./queries/insertPsnEarnedTrophies.js";
-import {Pool} from "pg";
+import {Pool, PoolClient} from "pg";
 import {upsertPsnUserProfiles} from "./queries/upsertPsnUserProfiles.js";
 import {PsnDataWrapper} from "../psn/models/wrappers/psnDataWrapper.js";
 import {InsertQueryResult} from "./models/insertQueryResult.js";
@@ -25,16 +25,16 @@ export async function insertPsnData(
     pool: Pool,
     data: PsnDataWrapper,
 ): Promise<void> {
-    const client = await pool.connect();
+    const client: PoolClient = await pool.connect();
     try {
         await client.query('BEGIN');
-        const userResponse: InsertQueryResult = await upsertPsnUserProfiles(pool, data.users);
-        const titlesResponse: InsertQueryResult = await insertPsnTitles(pool, data.titles);
-        const playedTitlesResponse: InsertQueryResult = await upsertPsnUserPlayedTitles(pool, data.playedTitles);
-        const trophySetsResponse: InsertQueryResult = await insertPsnTrophySets(pool, data.trophySets);
-        const titlesTrophySetResponse: InsertQueryResult = await insertPsnTitlesTrophySet(pool, data.titleTrophySets);
-        const trophyResponse: InsertQueryResult = await insertPsnTrophies(pool, data.trophies);
-        const earnedTrophyResponse: InsertQueryResult = await insertPsnEarnedTrophies(pool, data.earnedTrophies);
+        const userResponse: InsertQueryResult = await upsertPsnUserProfiles(client, data.users);
+        const titlesResponse: InsertQueryResult = await insertPsnTitles(client, data.titles);
+        const playedTitlesResponse: InsertQueryResult = await upsertPsnUserPlayedTitles(client, data.playedTitles);
+        const trophySetsResponse: InsertQueryResult = await insertPsnTrophySets(client, data.trophySets);
+        const titlesTrophySetResponse: InsertQueryResult = await insertPsnTitlesTrophySet(client, data.titleTrophySets);
+        const trophyResponse: InsertQueryResult = await insertPsnTrophies(client, data.trophies);
+        const earnedTrophyResponse: InsertQueryResult = await insertPsnEarnedTrophies(client, data.earnedTrophies);
         await client.query('COMMIT');
 
         console.info(`Upserted ${userResponse.rowsInserted} users into postgres database`);

@@ -1,21 +1,18 @@
-import {Pool} from "pg";
+import {PoolClient} from "pg";
 import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
 import {PsnTitle} from "../../psn/models/psnTitle.js";
 import {InsertQueryResult} from "../models/insertQueryResult.js";
 
 
 /**
- * Inserts a list of PSN titles into the PostgreSQL database.
- * Titles with conflicting IDs will be ignored.
+ * Inserts a list of PlayStation titles into the database. Skips any titles that conflict based on their ID.
  *
- * @param {Pool} pool - The database connection pool to use for executing the query.
- * @param {PsnTitle[]} titles - An array of PSN title objects to be inserted into the database.
- * Each title must contain fields for id, name, category, and imageUrl.
- * @return {Promise<InsertQueryResult>} A promise that resolves to an object containing the number
- * of rows inserted and the number of rows ignored (due to conflicts).
+ * @param {PoolClient} client - PostgreSQL client connection to be used for the operation.
+ * @param {PsnTitle[]} titles - Array of PlayStation titles to be inserted into the database.
+ * @return {Promise<InsertQueryResult>} - An object containing the count of rows inserted and rows ignored due to conflicts.
  */
 export async function insertPsnTitles(
-    pool: Pool,
+    client: PoolClient,
     titles: PsnTitle[]
 ): Promise<InsertQueryResult> {
     if (titles.length === 0) {
@@ -33,7 +30,7 @@ export async function insertPsnTitles(
         return buildPostgresInsertPlaceholders(currentValues, idx);
     }).join(',');
 
-    const insert = await pool.query(`
+    const insert = await client.query(`
         INSERT INTO psn.title (id, name, category, image_url)
         VALUES
             ${placeholders} ON CONFLICT (id)

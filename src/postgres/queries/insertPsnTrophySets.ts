@@ -1,20 +1,20 @@
-import {Pool} from "pg";
+import {PoolClient} from "pg";
 import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
 import {PsnTrophySet} from "../../psn/models/psnTrophySet.js";
 import {InsertQueryResult} from "../models/insertQueryResult.js";
 
 
 /**
- * Inserts an array of PSN trophy sets into the database using a provided connection pool.
- * Handles potential conflicts by ignoring duplicates based on the `id` field.
+ * Inserts an array of PlayStation Network (PSN) trophy sets into the database.
+ * If a trophy set with the same ID already exists, it will be ignored.
  *
- * @param {Pool} pool - The database connection pool used to execute the insertion query.
- * @param {PsnTrophySet[]} psnTrophySets - An array of trophy sets to be inserted into the database.
- * @return {Promise<InsertQueryResult>} A promise resolving to an object containing the number of rows successfully inserted (`rowsInserted`)
- * and the number of rows ignored due to conflicts (`rowsIgnored`).
+ * @param {PoolClient} client - The PostgreSQL client used to execute the query.
+ * @param {PsnTrophySet[]} psnTrophySets - An array of PSN trophy sets to be inserted into the database.
+ *                                          Each trophy set should include properties such as id, name, platform, version, serviceName, and iconUrl.
+ * @return {Promise<InsertQueryResult>} A promise that resolves to an object containing the number of rows inserted and ignored.
  */
 export async function insertPsnTrophySets(
-    pool: Pool,
+    client: PoolClient,
     psnTrophySets: PsnTrophySet[]
 ): Promise<InsertQueryResult> {
     if (psnTrophySets.length === 0) {
@@ -32,7 +32,7 @@ export async function insertPsnTrophySets(
         return buildPostgresInsertPlaceholders(currentValues, idx);
     }).join(',');
 
-    const insert = await pool.query(`
+    const insert = await client.query(`
         INSERT INTO psn.trophy_set (id, name, platform, version, service_name, icon_url)
         VALUES
             ${placeholders} ON CONFLICT (id)

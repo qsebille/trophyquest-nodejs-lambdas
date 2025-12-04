@@ -20,15 +20,15 @@ export async function deleteUserProfile(
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
-        const deleteUserEarnedTrophyQuery = await pool.query(`DELETE
-                                                              FROM psn.user_earned_trophy
-                                                              WHERE user_id = '${accountId}'`);
-        const deleteUserPlayedTitleQuery = await pool.query(`DELETE
-                                                             FROM psn.user_played_title
-                                                             WHERE user_id = '${accountId}'`);
-        const deleteUserProfileQuery = await pool.query(`DELETE
-                                                         FROM psn.user_profile
-                                                         WHERE id = '${accountId}'`);
+        const deleteUserEarnedTrophyQuery = await client.query(`DELETE
+                                                                FROM psn.user_earned_trophy
+                                                                WHERE user_id = '${accountId}'`);
+        const deleteUserPlayedTitleQuery = await client.query(`DELETE
+                                                               FROM psn.user_played_title
+                                                               WHERE user_id = '${accountId}'`);
+        const deleteUserProfileQuery = await client.query(`DELETE
+                                                           FROM psn.user_profile
+                                                           WHERE id = '${accountId}'`);
         await client.query('COMMIT');
 
 

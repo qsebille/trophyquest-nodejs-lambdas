@@ -1,20 +1,21 @@
-import {Pool} from "pg";
+import {PoolClient} from "pg";
 import {PsnTrophy} from "../../psn/models/psnTrophy.js";
 import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
 import {InsertQueryResult} from "../models/insertQueryResult.js";
 
 
 /**
- * Inserts a batch of PlayStation trophies into a PostgreSQL database. The method processes the trophies in batches and uses
- * prepared statements to improve performance. Duplicate entries are ignored based on the `id` field.
+ * Inserts a batch of PlayStation Network (PSN) trophy data into the database.
+ * This method processes trophies in batches to handle large data efficiently.
+ * Duplicate trophies based on their unique ID will be ignored.
  *
- * @param {Pool} pool - The PostgreSQL database connection pool used to execute the queries.
+ * @param {PoolClient} client - The database client to perform the insertion operation.
  * @param {PsnTrophy[]} trophies - An array of PSN trophies to be inserted into the database.
- * @return {Promise<InsertQueryResult>} A promise resolving to an object containing the counts of inserted rows (`rowsInserted`)
- * and ignored rows (`rowsIgnored`).
+ * @return {Promise<InsertQueryResult>} - A promise that resolves with the result of the insertion operation,
+ * containing the number of rows inserted and ignored.
  */
 export async function insertPsnTrophies(
-    pool: Pool,
+    client: PoolClient,
     trophies: PsnTrophy[]
 ): Promise<InsertQueryResult> {
     if (trophies.length === 0) {
@@ -48,7 +49,7 @@ export async function insertPsnTrophies(
             return buildPostgresInsertPlaceholders(currentValues, idx);
         }).join(',');
 
-        const insert = await pool.query(`
+        const insert = await client.query(`
             INSERT INTO psn.trophy (id, trophy_set_id, rank, title, detail, is_hidden, trophy_type, icon_url,
                                     game_group_id)
             VALUES
