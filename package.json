@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start-fetcher": "tsx src/psnFetcherMain.ts",
-    "start-refresher": "tsx src/psnRefresherMain.ts",
-    "start-deleter": "tsx src/psnUserDeleter.ts",
+    "start-fetcher": "tsx src/mainFetcher.ts",
+    "start-refresher": "tsx src/mainRefresher.ts",
+    "start-remover": "tsx src/mainRemover.ts",
     "test": "tsx --test"
   },
   "dependencies": {

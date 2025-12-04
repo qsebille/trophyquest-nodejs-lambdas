@@ -6,7 +6,7 @@ import {PsnUserPlayedTitle} from "../psnUserPlayedTitle.js";
 import {PsnTrophy} from "../psnTrophy.js";
 import {PsnEarnedTrophy} from "../psnEarnedTrophy.js";
 
-export type PsnRefreshData = {
+export type PsnDataWrapper = {
     users: PsnUser[];
     titles: PsnTitle[];
     trophySets: PsnTrophySet[];

@@ -1,20 +1,25 @@
 import {Pool} from "pg";
-import {PsnTrophy} from "../psn/models/psnTrophy.js";
-import {buildPostgresInsertPlaceholders} from "./utils/buildPostgresInsertPlaceholders.js";
+import {PsnTrophy} from "../../psn/models/psnTrophy.js";
+import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
+import {InsertQueryResult} from "../models/insertQueryResult.js";
+
 
 /**
- * Inserts a list of trophies into a Postgres database using batch processing.
- * Trophies that already exist (based on the `id` field) are ignored during the insertion.
+ * Inserts a batch of PlayStation trophies into a PostgreSQL database. The method processes the trophies in batches and uses
+ * prepared statements to improve performance. Duplicate entries are ignored based on the `id` field.
  *
- * @param {Pool} pool - The database connection pool used to execute queries against the Postgres database.
- * @param {PsnTrophy[]} trophies - The array of trophies to insert into the database. Each trophy object must adhere to the PsnTrophy structure.
- * @return {Promise<any>} A promise that resolves when the trophies have been successfully inserted into the database
- * or when there are no trophies to insert.
+ * @param {Pool} pool - The PostgreSQL database connection pool used to execute the queries.
+ * @param {PsnTrophy[]} trophies - An array of PSN trophies to be inserted into the database.
+ * @return {Promise<InsertQueryResult>} A promise resolving to an object containing the counts of inserted rows (`rowsInserted`)
+ * and ignored rows (`rowsIgnored`).
  */
-export async function insertTrophiesIntoPostgres(pool: Pool, trophies: PsnTrophy[]): Promise<any> {
+export async function insertPsnTrophies(
+    pool: Pool,
+    trophies: PsnTrophy[]
+): Promise<InsertQueryResult> {
     if (trophies.length === 0) {
         console.info("No trophies to insert into postgres database.");
-        return;
+        return {rowsInserted: 0, rowsIgnored: 0};
     }
 
     const batchSize: number = trophies.length > 1000 ? 1000 : trophies.length;
@@ -24,7 +29,10 @@ export async function insertTrophiesIntoPostgres(pool: Pool, trophies: PsnTrophy
     for (let i = 0; i < trophies.length; i += batchSize) {
         const batch = trophies.slice(i, i + batchSize);
         const values: string[] = [];
-        const placeholders: string = batch.map((t, idx) => {
+        const placeholders: string = batch.map((
+            t,
+            idx
+        ) => {
             const currentValues: string[] = [
                 t.id,
                 t.trophySetId,
@@ -52,5 +60,5 @@ export async function insertTrophiesIntoPostgres(pool: Pool, trophies: PsnTrophy
         nbIgnored += (batch.length - (insert.rowCount ?? 0));
     }
 
-    console.info(`Inserted ${nbInserted} trophies into postgres database ${nbIgnored > 0 ? `(${nbIgnored} ignored)` : ''}`);
+    return {rowsInserted: nbInserted, rowsIgnored: nbIgnored};
 }

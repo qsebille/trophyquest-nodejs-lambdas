@@ -13,7 +13,7 @@ import {PsnTrophyResponse} from "./models/psnTrophyResponse.js";
 import {fetchPsnUserTrophies} from "./fetchers/fetchPsnTrophies.js";
 import {PostgresUserProfile} from "../postgres/models/postgresUserProfile.js";
 import {PsnAuthTokens} from "../auth/psnAuthTokens.js";
-import {PsnRefreshData} from "./models/wrappers/psnRefreshData.js";
+import {PsnDataWrapper} from "./models/wrappers/psnDataWrapper.js";
 
 /**
  * Fetches and refreshes PlayStation Network (PSN) data for multiple user profiles.
@@ -21,12 +21,12 @@ import {PsnRefreshData} from "./models/wrappers/psnRefreshData.js";
  *
  * @param {PostgresUserProfile[]} userProfiles - An array of user profiles from the Postgres database to fetch and refresh data for.
  * @param {PsnAuthTokens} psnAuthTokens - The authentication tokens required to interact with the PSN API.
- * @return {Promise<PsnRefreshData>} A promise that resolves with the refreshed PSN data, including updated users, titles, played titles, trophy sets, title-trophy associations, trophies, and earned trophies.
+ * @return {Promise<PsnDataWrapper>} A promise that resolves with the wrapped PSN data, including updated users, titles, played titles, trophy sets, title-trophy associations, trophies, and earned trophies.
  */
-export async function fetchRefreshData(
+export async function refreshPsnData(
     userProfiles: PostgresUserProfile[],
     psnAuthTokens: PsnAuthTokens
-): Promise<PsnRefreshData> {
+): Promise<PsnDataWrapper> {
     let psnUsers: PsnUser[] = [];
     let allTitlesToUpdate: PsnTitle[] = [];
     let allTrophySetsToUpdate: PsnTrophySet[] = [];

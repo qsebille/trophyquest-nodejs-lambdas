@@ -1,0 +1,49 @@
+import {PsnUser} from "./models/psnUser.js";
+import {PsnTitle} from "./models/psnTitle.js";
+import {PsnTrophySet} from "./models/psnTrophySet.js";
+import {PsnTitleTrophySet} from "./models/psnTitleTrophySet.js";
+import {PsnUserPlayedTitle} from "./models/psnUserPlayedTitle.js";
+import {fetchPsnTitles} from "./fetchers/fetchPsnTitles.js";
+import {fetchPsnTrophySets} from "./fetchers/fetchPsnTrophySets.js";
+import {fetchPsnTitlesTrophySet} from "./fetchers/fetchPsnTitlesTrophySet.js";
+import {PsnTrophyResponse} from "./models/psnTrophyResponse.js";
+import {fetchPsnUserTrophies} from "./fetchers/fetchPsnTrophies.js";
+import {PsnAuthTokens} from "../auth/psnAuthTokens.js";
+import {PsnDataWrapper} from "./models/wrappers/psnDataWrapper.js";
+import {fetchPsnUser} from "./fetchers/fetchPsnUser.js";
+import {Params} from "../config/params.js";
+
+export async function fetchPsnUserData(
+    psnAuthTokens: PsnAuthTokens,
+    params: Params,
+): Promise<PsnDataWrapper> {
+    const psnUser: PsnUser = await fetchPsnUser(psnAuthTokens, params.profileName);
+    const accountId: string = psnUser.id;
+    console.info(`Fetched user ${psnUser.profileName} (${accountId}) from PSN API`);
+
+    // Fetch titles and trophy sets for a user
+    const titles: PsnTitle[] = await fetchPsnTitles(psnAuthTokens, accountId);
+    const playedTitles: PsnUserPlayedTitle[] = titles.map(t => {
+        return {userId: accountId, titleId: t.id, lastPlayedDateTime: t.lastPlayedDateTime};
+    });
+    console.info(`Found ${titles.length} titles`);
+    const trophySets: PsnTrophySet[] = await fetchPsnTrophySets(psnAuthTokens, accountId);
+    console.info(`Found ${trophySets.length} trophy sets`);
+    const titleTrophySets: PsnTitleTrophySet[] = await fetchPsnTitlesTrophySet(titles, trophySets, psnAuthTokens, accountId);
+    console.info(`Found ${titleTrophySets.length} titles / trophy sets links`);
+
+    // Fetch trophies for each title
+    const trophyResponse: PsnTrophyResponse = await fetchPsnUserTrophies(trophySets, psnAuthTokens, accountId);
+    console.info(`Found ${trophyResponse.trophies.length} trophies`);
+    console.info(`Found ${trophyResponse.earnedTrophies.length} earned trophies`);
+
+    return {
+        users: [psnUser],
+        titles: titles,
+        playedTitles: playedTitles,
+        trophySets: trophySets,
+        titleTrophySets: titleTrophySets,
+        trophies: trophyResponse.trophies,
+        earnedTrophies: trophyResponse.earnedTrophies,
+    };
+}

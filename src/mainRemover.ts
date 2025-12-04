@@ -9,7 +9,7 @@ import {deleteUserProfile} from "./postgres/deleteUserProfile.js";
 
 async function main() {
     const startTime = Date.now();
-    console.info("START PSN Remover")
+    console.info("START PSN User remover")
 
     const params: Params = getParams();
     const pool: Pool = buildPostgresPool();
