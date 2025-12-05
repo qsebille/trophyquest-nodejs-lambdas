@@ -1,4 +1,4 @@
-import {TrophyCollectionStaging} from "./trophyCollectionStaging.js";
+import {GameCollectionStaging} from "./gameCollectionStaging.js";
 import {PsnTrophy} from "../../../psn/models/psnTrophy.js";
 import {computeTrophyUuid} from "../../utils/uuid.js";
 
@@ -16,10 +16,10 @@ export interface TrophyStaging {
 }
 
 export function buildTrophyStaging(
-    trophyCollectionStaging: TrophyCollectionStaging[],
+    trophyCollectionStaging: GameCollectionStaging[],
     psnTrophies: PsnTrophy[],
 ): TrophyStaging[] {
-    const collectionStagingByPsnId = new Map<string, TrophyCollectionStaging>(trophyCollectionStaging.map(c => [c.psnTrophySetId, c]));
+    const collectionStagingByPsnId = new Map<string, GameCollectionStaging>(trophyCollectionStaging.map(c => [c.psnTrophySetId, c]));
 
     const trophyStaging: TrophyStaging[] = [];
     for (const trophy of psnTrophies) {
