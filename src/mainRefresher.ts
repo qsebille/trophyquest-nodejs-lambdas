@@ -2,7 +2,7 @@ import {getParams, Params} from "./config/params.js";
 import {buildPostgresPool} from "./postgres/utils/buildPostgresPool.js";
 import {Pool} from "pg";
 import {getPsnAuthTokens, PsnAuthTokens} from "./auth/psnAuthTokens.js";
-import {PostgresUserProfile} from "./postgres/models/postgresUserProfile.js";
+import {AppPlayer} from "./app/models/appPlayer.js";
 import {getAllPsnUsers} from "./postgres/queries/getAllPsnUsers.js";
 import {PsnDataWrapper} from "./psn/models/wrappers/psnDataWrapper.js";
 import {refreshPsnData} from "./psn/refreshPsnData.js";
@@ -16,7 +16,7 @@ import {insertPsnData} from "./postgres/insertPsnData.js";
  *
  * @return {Promise<void>} A Promise that resolves when the entire update process completes, including database operations, or rejects if an error occurs.
  */
-async function main() {
+async function main(): Promise<void> {
     const startTime = Date.now();
     console.info("START PSN Refresher")
 
@@ -25,7 +25,7 @@ async function main() {
 
     try {
         const psnAuthTokens: PsnAuthTokens = await getPsnAuthTokens(params.npsso);
-        const userProfiles: PostgresUserProfile[] = await getAllPsnUsers(pool);
+        const userProfiles: AppPlayer[] = await getAllPsnUsers(pool);
         const psnData: PsnDataWrapper = await refreshPsnData(userProfiles, psnAuthTokens);
         await insertPsnData(pool, psnData);
     } finally {

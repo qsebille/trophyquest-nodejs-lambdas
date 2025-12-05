@@ -5,6 +5,8 @@ import {getPsnAuthTokens, PsnAuthTokens} from "./auth/psnAuthTokens.js";
 import {PsnDataWrapper} from "./psn/models/wrappers/psnDataWrapper.js";
 import {fetchPsnUserData} from "./psn/fetchPsnUserData.js";
 import {insertPsnData} from "./postgres/insertPsnData.js";
+import {AppDataWrapper} from "./app/models/wrappers/appDataWrapper.js";
+import computeAppData from "./app/computeAppData.js";
 
 
 /**
@@ -13,9 +15,9 @@ import {insertPsnData} from "./postgres/insertPsnData.js";
  *
  * @return {Promise<void>} A promise that resolves when the entire process is completed successfully, or rejects if any errors occur during execution.
  */
-async function main() {
+async function main(): Promise<void> {
     const startTime = Date.now();
-    console.info("START PSN Fetcher")
+    console.info("START PSN Fetcher");
 
     const params: Params = getParams();
     const pool: Pool = buildPostgresPool();
@@ -24,6 +26,7 @@ async function main() {
         const psnAuthTokens: PsnAuthTokens = await getPsnAuthTokens(params.npsso);
         const psnData: PsnDataWrapper = await fetchPsnUserData(psnAuthTokens, params);
         await insertPsnData(pool, psnData);
+        const appData: AppDataWrapper = computeAppData(psnData);
 
         console.info("SUCCESS");
     } finally {
