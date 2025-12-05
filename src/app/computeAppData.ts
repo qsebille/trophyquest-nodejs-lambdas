@@ -1,7 +1,7 @@
 import {PsnDataWrapper} from "../psn/models/wrappers/psnDataWrapper.js";
 import {AppDataWrapper} from "./models/wrappers/appDataWrapper.js";
 import {buildUserProfileStaging, UserStaging} from "./models/staging/userStaging.js";
-import {buildTrophyCollectionStaging, TrophyCollectionStaging} from "./models/staging/trophyCollectionStaging.js";
+import {buildGameCollectionStaging, GameCollectionStaging} from "./models/staging/gameCollectionStaging.js";
 import {buildTrophyStaging, TrophyStaging} from "./models/staging/trophyStaging.js";
 import {AppPlayer, buildAppPlayer} from "./models/appPlayer.js";
 import {AppGame, buildAppGames} from "./models/appGame.js";
@@ -14,7 +14,7 @@ import {AppEarnedTrophy, buildAppEarnedTrophies} from "./models/appEarnedTrophy.
 
 function computeAppData(psnData: PsnDataWrapper): AppDataWrapper {
     const userProfileStaging: UserStaging[] = buildUserProfileStaging(psnData.users);
-    const trophyCollectionStaging: TrophyCollectionStaging[] = buildTrophyCollectionStaging(psnData.titles, psnData.trophySets, psnData.titleTrophySets);
+    const trophyCollectionStaging: GameCollectionStaging[] = buildGameCollectionStaging(psnData.titles, psnData.trophySets, psnData.titleTrophySets);
     const trophyStaging: TrophyStaging[] = buildTrophyStaging(trophyCollectionStaging, psnData.trophies);
 
     const appPlayers: AppPlayer[] = buildAppPlayer(userProfileStaging);

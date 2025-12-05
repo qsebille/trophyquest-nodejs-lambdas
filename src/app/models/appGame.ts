@@ -1,4 +1,4 @@
-import {TrophyCollectionStaging} from "./staging/trophyCollectionStaging.js";
+import {GameCollectionStaging} from "./staging/gameCollectionStaging.js";
 
 export interface AppGame {
     id: string,
@@ -6,12 +6,12 @@ export interface AppGame {
     image_url: string
 }
 
-export function buildAppGames(collectionStaging: TrophyCollectionStaging[]) {
+export function buildAppGames(collectionStaging: GameCollectionStaging[]) {
     const gameIds: Set<string> = new Set(collectionStaging.map(g => g.gameAppUuid));
     const games: AppGame[] = [];
     for (const gameId of gameIds) {
         const collection = collectionStaging.filter(g => g.gameAppUuid === gameId)[0];
-        games.push({id: gameId, title: collection.name, image_url: collection.imageUrl});
+        games.push({id: gameId, title: collection.gameName, image_url: collection.gameImageUrl});
     }
 
     return games;

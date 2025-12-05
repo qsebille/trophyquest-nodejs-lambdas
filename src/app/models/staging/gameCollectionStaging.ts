@@ -4,25 +4,27 @@ import {PsnTitleTrophySet} from "../../../psn/models/psnTitleTrophySet.js";
 import {computeGameUuid, computeTrophyCollectionUuid} from "../../utils/uuid.js";
 
 
-export interface TrophyCollectionStaging {
-    psnTitleId: string;
+export interface GameCollectionStaging {
     gameAppUuid: string;
+    gameName: string;
+    gameImageUrl: string;
+    psnTitleId: string;
     psnTrophySetId: string;
     trophyCollectionAppUuid: string;
-    name: string;
-    platform: string;
-    imageUrl: string;
+    trophyCollectionName: string;
+    trophyCollectionPlatform: string;
+    trophyCollectionImageUrl: string;
 }
 
-export function buildTrophyCollectionStaging(
+export function buildGameCollectionStaging(
     psnTitles: PsnTitle[],
     psnTrophySets: PsnTrophySet[],
     psnTitlesTrophySets: PsnTitleTrophySet[]
-): TrophyCollectionStaging[] {
+): GameCollectionStaging[] {
     const titleById = new Map<string, PsnTitle>(psnTitles.map(t => [t.id, t]));
     const trophySetById = new Map<string, PsnTrophySet>(psnTrophySets.map(ts => [ts.id, ts]));
 
-    const collectionStaging: TrophyCollectionStaging[] = [];
+    const collectionStaging: GameCollectionStaging[] = [];
     for (const link of psnTitlesTrophySets) {
         const psnTitle = titleById.get(link.titleId);
         const psnTrophySet = trophySetById.get(link.trophySetId);
@@ -35,13 +37,15 @@ export function buildTrophyCollectionStaging(
         const trophyCollectionAppUuid: string = computeTrophyCollectionUuid(gameAppUuid, psnTrophySet.id);
 
         collectionStaging.push({
-            psnTitleId: psnTitle.id,
             gameAppUuid,
+            gameName: psnTitle.name,
+            gameImageUrl: psnTitle.imageUrl,
+            psnTitleId: psnTitle.id,
             psnTrophySetId: psnTrophySet.id,
             trophyCollectionAppUuid,
-            name: psnTrophySet.name,
-            platform: psnTrophySet.platform,
-            imageUrl: psnTrophySet.iconUrl,
+            trophyCollectionName: psnTrophySet.name,
+            trophyCollectionPlatform: psnTrophySet.platform,
+            trophyCollectionImageUrl: psnTrophySet.iconUrl,
         });
     }
 

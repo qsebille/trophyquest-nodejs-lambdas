@@ -1,6 +1,6 @@
 import {PsnPlayedTitle} from "../../psn/models/psnPlayedTitle.js";
 import {UserStaging} from "./staging/userStaging.js";
-import {TrophyCollectionStaging} from "./staging/trophyCollectionStaging.js";
+import {GameCollectionStaging} from "./staging/gameCollectionStaging.js";
 
 export interface AppPlayedGame {
     player_id: string,
@@ -11,10 +11,10 @@ export interface AppPlayedGame {
 export function buildAppPlayedGames(
     psnUserPlayedTitles: PsnPlayedTitle[],
     userStaging: UserStaging[],
-    gameTrophyCollectionStaging: TrophyCollectionStaging[],
+    gameCollectionStaging: GameCollectionStaging[],
 ): AppPlayedGame[] {
     const userStagingById = new Map<string, UserStaging>(userStaging.map(u => [u.userPsnId, u]));
-    const gameTrophyCollectionStagingByPsnTitleId = new Map<string, TrophyCollectionStaging>(gameTrophyCollectionStaging.map(c => [c.psnTitleId, c]));
+    const gameTrophyCollectionStagingByPsnTitleId = new Map<string, GameCollectionStaging>(gameCollectionStaging.map(c => [c.psnTitleId, c]));
 
     const appUserGames: AppPlayedGame[] = [];
     const ids = new Set<String>();

@@ -1,4 +1,4 @@
-import {TrophyCollectionStaging} from "./staging/trophyCollectionStaging.js";
+import {GameCollectionStaging} from "./staging/gameCollectionStaging.js";
 
 export interface AppTrophyCollection {
     id: string;
@@ -8,12 +8,12 @@ export interface AppTrophyCollection {
     image_url: string;
 }
 
-export function buildAppTrophyCollections(staging: TrophyCollectionStaging[]): AppTrophyCollection[] {
+export function buildAppTrophyCollections(staging: GameCollectionStaging[]): AppTrophyCollection[] {
     return staging.map(trophyCollection => ({
         id: trophyCollection.trophyCollectionAppUuid,
         game_id: trophyCollection.gameAppUuid,
-        title: trophyCollection.name,
-        platform: trophyCollection.platform,
-        image_url: trophyCollection.imageUrl
+        title: trophyCollection.trophyCollectionName,
+        platform: trophyCollection.trophyCollectionPlatform,
+        image_url: trophyCollection.trophyCollectionImageUrl
     }));
 }
