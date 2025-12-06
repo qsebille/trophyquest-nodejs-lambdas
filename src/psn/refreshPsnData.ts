@@ -54,6 +54,11 @@ export async function refreshPsnData(
         // Fetch titles
         const titles: PsnTitle[] = await fetchPsnTitles(psnAuthTokens, accountId);
         const titlesToUpdate: PsnTitle[] = titles.filter(title => new Date(title.lastPlayedDateTime) > userLastUpdate);
+        if (titlesToUpdate.length === 0) {
+            console.info(`[PSN-REFRESH::${postgresUser.name}] No titles played since last update // Skipping user`);
+            result.users.push(psnUser);
+            continue;
+        }
         const titlesToAdd: PsnTitle[] = titlesToUpdate.filter(title => !titleIds.has(title.id));
         console.info(`[PSN-REFRESH::${postgresUser.name}] Found ${titles.length} titles`);
         console.info(`[PSN-REFRESH::${postgresUser.name}] Found ${titlesToUpdate.length} titles played since last update`);
