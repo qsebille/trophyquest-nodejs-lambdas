@@ -11,15 +11,14 @@ import {fetchPsnUserTrophies} from "./fetchers/fetchPsnTrophies.js";
 import {PsnAuthTokens} from "../auth/psnAuthTokens.js";
 import {PsnDataWrapper} from "./models/wrappers/psnDataWrapper.js";
 import {fetchPsnUser} from "./fetchers/fetchPsnUser.js";
-import {Params} from "../config/params.js";
 import {PsnPlayedTrophySet} from "./models/psnPlayedTrophySet.js";
 import {buildPsnPlayedTrophySet} from "./builders/buildPsnPlayedTrophySet.js";
 
 export async function fetchPsnUserData(
     psnAuthTokens: PsnAuthTokens,
-    params: Params,
+    profileName: string,
 ): Promise<PsnDataWrapper> {
-    const psnUser: PsnUser = await fetchPsnUser(psnAuthTokens, params.profileName);
+    const psnUser: PsnUser = await fetchPsnUser(psnAuthTokens, profileName);
     const accountId: string = psnUser.id;
     console.info(`[PSN-FETCHER] Fetched user ${psnUser.profileName} (${accountId}) from PSN API`);
 

@@ -55,7 +55,7 @@ export async function refreshPsnData(
         const titles: PsnTitle[] = await fetchPsnTitles(psnAuthTokens, accountId);
         const titlesToUpdate: PsnTitle[] = titles.filter(title => new Date(title.lastPlayedDateTime) > userLastUpdate);
         if (titlesToUpdate.length === 0) {
-            console.info(`[PSN-REFRESH::${postgresUser.name}] No titles played since last update // Skipping user`);
+            console.info(`[PSN-REFRESH::${postgresUser.name}] No titles played since last update // Skipping user\n`);
             result.users.push(psnUser);
             continue;
         }

@@ -1,0 +1,1 @@
+Compress-Archive -Path dist, node_modules, package.json -DestinationPath psn-fetcher.zip
