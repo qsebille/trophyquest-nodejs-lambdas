@@ -38,7 +38,6 @@ export async function fetchPsnUserData(
     const trophyResponse: PsnTrophyResponse = await fetchPsnUserTrophies(trophySets, psnAuthTokens, accountId);
     console.info(`[PSN-FETCHER] Found ${trophyResponse.trophies.length} trophies`);
     console.info(`[PSN-FETCHER] Found ${trophyResponse.earnedTrophies.length} earned trophies`);
-    console.info("\n");
 
     return {
         users: [psnUser],

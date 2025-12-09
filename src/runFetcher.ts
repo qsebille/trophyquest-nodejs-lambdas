@@ -7,8 +7,7 @@ import {insertPsnData} from "./postgres/insertPsnData.js";
 import {AppDataWrapper} from "./app/models/wrappers/appDataWrapper.js";
 import computeAppData from "./app/computeAppData.js";
 import {insertAppData} from "./postgres/insertAppData.js";
-import {getNpsso} from "./config/getNpsso.js";
-import {getProfileName} from "./config/getProfileName.js";
+import {getMandatoryParam} from "./config/getMandatoryParam.js";
 
 /**
  * Main method that coordinates the fetching, processing, and storing of PlayStation Network (PSN) user data, including titles, trophy sets, trophies, and earned trophies.
@@ -20,16 +19,16 @@ async function runFetcher(): Promise<void> {
     const startTime = Date.now();
     console.info("[PSN-FETCHER] Start");
 
-    const npsso: string = getNpsso();
-    const profileName: string = getProfileName();
+    const npsso: string = getMandatoryParam('NPSSO');
+    const profileName: string = getMandatoryParam('PROFILE_NAME');
     const pool: Pool = buildPostgresPool();
     console.info(`[PSN-FETCHER] Fetching user data for profile ${profileName}`);
 
     try {
         const psnAuthTokens: PsnAuthTokens = await getPsnAuthTokens(npsso);
         const psnData: PsnDataWrapper = await fetchPsnUserData(psnAuthTokens, profileName);
-        await insertPsnData(pool, psnData);
         const appData: AppDataWrapper = computeAppData(psnData);
+        await insertPsnData(pool, psnData);
         await insertAppData(pool, appData);
         console.info("[PSN-FETCHER] Success");
     } finally {

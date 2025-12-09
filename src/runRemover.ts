@@ -4,8 +4,7 @@ import {getPsnAuthTokens, PsnAuthTokens} from "./auth/psnAuthTokens.js";
 import {PsnUser} from "./psn/models/psnUser.js";
 import {fetchPsnUser} from "./psn/fetchers/fetchPsnUser.js";
 import {deleteUserProfile} from "./postgres/deleteUserProfile.js";
-import {getNpsso} from "./config/getNpsso.js";
-import {getProfileName} from "./config/getProfileName.js";
+import {getMandatoryParam} from "./config/getMandatoryParam.js";
 
 
 /**
@@ -17,10 +16,10 @@ import {getProfileName} from "./config/getProfileName.js";
  */
 async function main(): Promise<void> {
     const startTime = Date.now();
-    console.info("START PSN User remover")
+    console.info("[USER-REMOVER] START PSN User remover")
 
-    const npsso: string = getNpsso();
-    const profileName: string = getProfileName();
+    const npsso: string = getMandatoryParam('NPSSO');
+    const profileName: string = getMandatoryParam('PROFILE_NAME');
     const pool: Pool = buildPostgresPool();
 
     try {
@@ -28,10 +27,10 @@ async function main(): Promise<void> {
         const psnUser: PsnUser = await fetchPsnUser(psnAuthTokens, profileName);
         const accountId: string = psnUser.id;
         await deleteUserProfile(pool, accountId);
-        console.info("SUCCESS");
+        console.info("[USER-REMOVER] Success");
     } finally {
         const durationSeconds = (Date.now() - startTime) / 1000;
-        console.info(`Total processing time: ${durationSeconds.toFixed(2)} s`);
+        console.info(`[USER-REMOVER] Total processing time: ${durationSeconds.toFixed(2)} s`);
         await pool.end();
     }
 }

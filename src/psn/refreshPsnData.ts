@@ -55,7 +55,7 @@ export async function refreshPsnData(
         const titles: PsnTitle[] = await fetchPsnTitles(psnAuthTokens, accountId);
         const titlesToUpdate: PsnTitle[] = titles.filter(title => new Date(title.lastPlayedDateTime) > userLastUpdate);
         if (titlesToUpdate.length === 0) {
-            console.info(`[PSN-REFRESH::${postgresUser.name}] No titles played since last update // Skipping user\n`);
+            console.info(`[PSN-REFRESH::${postgresUser.name}] No titles played since last update // Skipping user`);
             result.users.push(psnUser);
             continue;
         }
@@ -107,7 +107,6 @@ export async function refreshPsnData(
         result.playedTitles.push(...playedTitlesToUpdate);
         result.playedTrophySets.push(...playedTrophySets);
         result.earnedTrophies.push(...earnedTrophiesToAdd);
-        console.info("\n");
     }
 
     console.info(`[PSN-REFRESH] Found ${result.users.length} users to update`);
@@ -118,7 +117,6 @@ export async function refreshPsnData(
     console.info(`[PSN-REFRESH] Found ${result.playedTitles.length} titles / trophy sets links to update`);
     console.info(`[PSN-REFRESH] Found ${result.playedTrophySets.length} trophies to update`);
     console.info(`[PSN-REFRESH] Found ${result.earnedTrophies.length} earned trophies to update`);
-    console.info("\n");
 
     return result
 }
