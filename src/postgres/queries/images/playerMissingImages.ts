@@ -44,7 +44,7 @@ export async function updatePlayerMissingAwsImages(
     const update = await pool.query(
         `
             UPDATE app.game AS g
-            SET aws_image_url = v.aws_image_url FROM ( VALUES ${placeholders} ) AS v(id, aws_image_url)
+            SET aws_avatar_url = v.aws_avatar_url FROM ( VALUES ${placeholders} ) AS v(id, aws_image_url)
             WHERE g.id = v.id::uuid
         `,
         values
