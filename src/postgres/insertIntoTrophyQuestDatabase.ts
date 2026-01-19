@@ -1,12 +1,12 @@
 import {Pool, PoolClient} from "pg";
 import {EditionTrophySuiteLink} from "../models/EditionTrophySuiteLink.js";
 import {insertIntoPsnGameTable} from "./insert/insertIntoPsnGameTable.js";
-import {UserPlayedGame} from "../models/UserPlayedGame.js";
-import {UserPlayedEdition} from "../models/UserPlayedEdition.js";
+import {PlayedGame} from "../models/PlayedGame.js";
+import {PlayedEdition} from "../models/PlayedEdition.js";
 import {TrophySuiteGroup} from "../models/TrophySuiteGroup.js";
 import {EarnedTrophy} from "../models/EarnedTrophy.js";
 import {Trophy} from "../models/Trophy.js";
-import {UserPlayedTrophySuite} from "../models/UserPlayedTrophySuite.js";
+import {PlayedTrophySuite} from "../models/PlayedTrophySuite.js";
 import {Player} from "../models/Player.js";
 import {insertIntoPsnPlayerTable} from "./insert/insertIntoPsnPlayerTable.js";
 import {insertIntoPsnPlayedGameTable} from "./insert/insertIntoPsnPlayedGameTable.js";
@@ -23,9 +23,9 @@ import {insertIntoPsnEarnedTrophyTable} from "./insert/insertIntoPsnEarnedTrophy
 export async function insertIntoTrophyQuestDatabase(
     pool: Pool,
     players: Player[],
-    playedGames: UserPlayedGame[],
-    playedEditions: UserPlayedEdition[],
-    playedTrophySuites: UserPlayedTrophySuite[],
+    playedGames: PlayedGame[],
+    playedEditions: PlayedEdition[],
+    playedTrophySuites: PlayedTrophySuite[],
     editionTrophySuiteLinks: EditionTrophySuiteLink[],
     trophySuiteGroups: TrophySuiteGroup[],
     trophies: Trophy[],

@@ -1,9 +1,9 @@
 import {PoolClient} from "pg";
 import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
 import {computeGameUuid, computePlayerUuid} from "../../uuid/uuid.js";
-import {UserPlayedGame} from "../../models/UserPlayedGame.js";
+import {PlayedGame} from "../../models/PlayedGame.js";
 
-export async function insertIntoPsnPlayedGameTable(client: PoolClient, playedGames: UserPlayedGame[]) {
+export async function insertIntoPsnPlayedGameTable(client: PoolClient, playedGames: PlayedGame[]) {
     if (playedGames.length === 0) {
         console.warn("No data to insert into app.psn_played_game table.");
         return {rowsInserted: 0, rowsIgnored: 0};
@@ -28,7 +28,9 @@ export async function insertIntoPsnPlayedGameTable(client: PoolClient, playedGam
 
         const insert = await client.query(`
             insert into app.psn_played_game (player_id, game_id, first_played_at, last_played_at)
-            values ${placeholders} on conflict (player_id,game_id) do
+            values
+            ${placeholders} on conflict (player_id,game_id)
+            do
             update set last_played_at=EXCLUDED.last_played_at
         `, values);
 

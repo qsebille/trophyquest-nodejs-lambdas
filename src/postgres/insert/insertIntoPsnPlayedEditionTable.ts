@@ -1,9 +1,9 @@
 import {PoolClient} from "pg";
 import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
 import {computeEditionUuid, computePlayerUuid} from "../../uuid/uuid.js";
-import {UserPlayedEdition} from "../../models/UserPlayedEdition.js";
+import {PlayedEdition} from "../../models/PlayedEdition.js";
 
-export async function insertIntoPsnPlayedEditionTable(client: PoolClient, playedEditions: UserPlayedEdition[]) {
+export async function insertIntoPsnPlayedEditionTable(client: PoolClient, playedEditions: PlayedEdition[]) {
     if (playedEditions.length === 0) {
         console.warn("No data to insert into app.psn_played_edition table.");
         return {rowsInserted: 0, rowsIgnored: 0};

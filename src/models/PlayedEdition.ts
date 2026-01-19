@@ -1,6 +1,6 @@
 import {Edition} from "./Edition.js";
 
-export interface UserPlayedEdition {
+export interface PlayedEdition {
     edition: Edition,
     playerId: string,
     lastPlayedAt: string,

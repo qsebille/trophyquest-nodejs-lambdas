@@ -1,5 +1,5 @@
 import {AuthorizationPayload} from "psn-api";
-import {UserPlayedTrophySuite} from "../../models/UserPlayedTrophySuite.js";
+import {PlayedTrophySuite} from "../../models/PlayedTrophySuite.js";
 import {mapWithConcurrency} from "../../aws/utils/mapWithConcurrency.js";
 import {fetchTrophiesForSuite} from "./fetchTrophiesForSuite.js";
 import {Trophy} from "../../models/Trophy.js";
@@ -7,7 +7,6 @@ import {EarnedTrophy} from "../../models/EarnedTrophy.js";
 import {fetchEarnedTrophiesForSuite} from "./fetchEarnedTrophiesForSuite.js";
 import {fetchGroupsForSuite} from "./fetchGroupsForSuite.js";
 import {TrophySuiteGroup} from "../../models/TrophySuiteGroup.js";
-import {Player} from "../../models/Player.js";
 
 export type TrophyDataResponse = {
     trophies: Trophy[];
@@ -17,14 +16,13 @@ export type TrophyDataResponse = {
 
 export async function fetchTrophies(
     auth: AuthorizationPayload,
-    player: Player,
-    trophySuites: UserPlayedTrophySuite[],
+    accountId: string,
+    trophySuites: PlayedTrophySuite[],
     concurrency: number,
 ): Promise<TrophyDataResponse> {
     const startTime = Date.now();
     const safeConcurrency = Math.max(1, concurrency);
 
-    const accountId = player.id;
     const perSetResults: TrophyDataResponse[] = await mapWithConcurrency(
         trophySuites,
         safeConcurrency,

@@ -1,20 +1,18 @@
 import {AuthorizationPayload, UserTitlesResponse} from "psn-api";
-import {UserPlayedTrophySuite} from "../../models/UserPlayedTrophySuite.js";
-import {Player} from "../../models/Player.js";
+import {PlayedTrophySuite} from "../../models/PlayedTrophySuite.js";
 
 const PSN_TITLE_BATCH_SIZE: number = 200
 
 export async function fetchTrophySuites(
     auth: AuthorizationPayload,
-    player: Player,
-): Promise<UserPlayedTrophySuite[]> {
+    accountId: string,
+): Promise<PlayedTrophySuite[]> {
     const {getUserTitles} = await import("psn-api");
 
     const startTime = Date.now();
 
-    const accountId = player.id;
     let offset = 0;
-    const result: UserPlayedTrophySuite[] = [];
+    const result: PlayedTrophySuite[] = [];
     while (true) {
         const options = {limit: PSN_TITLE_BATCH_SIZE, offset};
         const userTitlesResponse: UserTitlesResponse = await getUserTitles(auth, accountId, options);
@@ -30,7 +28,7 @@ export async function fetchTrophySuites(
                         hasTrophyGroups: trophyTitle.hasTrophyGroups,
                         npServiceName: trophyTitle.npServiceName,
                     },
-                    playerId: player.id,
+                    playerId: accountId,
                     lastPlayedAt: trophyTitle.lastUpdatedDateTime,
                 }
             });

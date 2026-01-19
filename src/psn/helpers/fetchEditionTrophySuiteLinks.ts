@@ -1,15 +1,14 @@
 import {AuthorizationPayload, UserTrophiesBySpecificTitleResponse} from "psn-api";
-import {UserPlayedEdition} from "../../models/UserPlayedEdition.js";
+import {PlayedEdition} from "../../models/PlayedEdition.js";
 import {EditionTrophySuiteLink} from "../../models/EditionTrophySuiteLink.js";
-import {Player} from "../../models/Player.js";
 import {mapWithConcurrency} from "../../aws/utils/mapWithConcurrency.js";
 
 const TITLES_BATCH_SIZE: number = 5;
 
 export async function fetchEditionTrophySuiteLinks(
     auth: AuthorizationPayload,
-    player: Player,
-    playedEditions: UserPlayedEdition[],
+    accountId: string,
+    playedEditions: PlayedEdition[],
     concurrency: number = 10,
 ): Promise<EditionTrophySuiteLink[]> {
     const {getUserTrophiesForSpecificTitle} = await import("psn-api");
@@ -17,7 +16,6 @@ export async function fetchEditionTrophySuiteLinks(
     const startTime = Date.now();
     const safeConcurrency = Math.max(1, concurrency);
 
-    const accountId = player.id;
     const npTitleIds = playedEditions.map(p => p.edition.id);
     const batchs: string[] = [];
     for (let i = 0; i < npTitleIds.length; i += TITLES_BATCH_SIZE) {

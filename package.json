@@ -6,8 +6,6 @@
     "build": "tsc -p tsconfig.json",
     "start-fetcher": "tsx src/runFetcher.ts",
     "start-refresher": "tsx src/runRefresher.ts",
-    "start-remover": "tsx src/runRemover.ts",
-    "start-image-uploader": "tsx src/runImageUploader.ts",
     "test": "tsx --test"
   },
   "dependencies": {

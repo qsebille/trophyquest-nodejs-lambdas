@@ -1,24 +1,23 @@
 import {fetchUserPlayedTitles} from "./fetchPlayedTitles.js";
 import {AuthorizationPayload} from "psn-api";
-import {UserPlayedGame} from "../../models/UserPlayedGame.js";
-import {UserPlayedEdition} from "../../models/UserPlayedEdition.js";
-import {Player} from "../../models/Player.js";
+import {PlayedGame} from "../../models/PlayedGame.js";
+import {PlayedEdition} from "../../models/PlayedEdition.js";
 
 export type UserGamesEditionsData = {
-    games: UserPlayedGame[];
-    editions: UserPlayedEdition[];
+    games: PlayedGame[];
+    editions: PlayedEdition[];
 }
 
 export async function fetchUserGamesAndEditions(
     auth: AuthorizationPayload,
-    player: Player,
+    accountId: string,
+    limitDate?: Date,
 ): Promise<UserGamesEditionsData> {
     const startTime = Date.now();
-    const accountId = player.id;
-    const playedTitles = await fetchUserPlayedTitles(auth, accountId);
+    const playedTitles = await fetchUserPlayedTitles(auth, accountId, {limitDate});
 
-    const gameMap = new Map<number, UserPlayedGame>();
-    const editions: UserPlayedEdition[] = [];
+    const gameMap = new Map<number, PlayedGame>();
+    const editions: PlayedEdition[] = [];
     playedTitles
         .forEach(playedTitle => {
             // Games
@@ -40,7 +39,7 @@ export async function fetchUserGamesAndEditions(
                         images: playedTitle.concept.media.images,
                         psnTitleIds: playedTitle.concept.titleIds
                     },
-                    playerId: player.id,
+                    playerId: accountId,
                     firstPlayedAt: playedTitle.firstPlayedDateTime,
                     lastPlayedAt: playedTitle.lastPlayedDateTime,
                 });
@@ -56,7 +55,7 @@ export async function fetchUserGamesAndEditions(
                     category: playedTitle.category,
                     service: playedTitle.service,
                 },
-                playerId: player.id,
+                playerId: accountId,
                 lastPlayedAt: playedTitle.lastPlayedDateTime,
             });
         });

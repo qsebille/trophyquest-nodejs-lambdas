@@ -14,7 +14,7 @@ import {insertIntoTrophyQuestDatabase} from "./postgres/insertIntoTrophyQuestDat
 
 async function runFetcher(): Promise<void> {
     const startTime = Date.now();
-    console.info("Start PSN Fetcher function");
+    console.info("PSN Fetcher: Start");
 
     const npsso: string = getMandatoryParam('NPSSO');
     const profileName: string = getMandatoryParam('PROFILE_NAME');
@@ -26,12 +26,13 @@ async function runFetcher(): Promise<void> {
         // Auth + user info
         const auth: AuthorizationPayload = await getAuthorizationPayload(npsso);
         const player: Player = await getUserProfile(auth, profileName);
+        const accountId: string = player.id;
 
         // Fetch data from PSN API
-        const playedGamesAndEditions = await fetchUserGamesAndEditions(auth, player);
-        const editionTrophySuiteLinks = await fetchEditionTrophySuiteLinks(auth, player, playedGamesAndEditions.editions)
-        const playedTrophySuites = await fetchTrophySuites(auth, player);
-        const userTrophyData = await fetchTrophies(auth, player, playedTrophySuites, concurrency);
+        const playedGamesAndEditions = await fetchUserGamesAndEditions(auth, accountId);
+        const editionTrophySuiteLinks = await fetchEditionTrophySuiteLinks(auth, accountId, playedGamesAndEditions.editions)
+        const playedTrophySuites = await fetchTrophySuites(auth, accountId);
+        const userTrophyData = await fetchTrophies(auth, accountId, playedTrophySuites, concurrency);
 
         // Insert data into database
         await insertIntoTrophyQuestDatabase(

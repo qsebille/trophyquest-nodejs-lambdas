@@ -1,9 +1,8 @@
 import {AuthorizationPayload, UserPlayedGamesResponse} from "psn-api";
 
-const DEFAULT_PLAYED_GAMES_PAGE_SIZE = 50;
+const DEFAULT_PLAYED_GAMES_PAGE_SIZE = 100;
 
 interface UserDataOptions {
-    pageSize?: number;
     limitDate?: Date;
 }
 
@@ -16,12 +15,11 @@ export async function fetchUserPlayedTitles(
 
     const result = [];
     let offset = 0;
-    const pageSize = options?.pageSize ?? DEFAULT_PLAYED_GAMES_PAGE_SIZE;
     const limitDate = options?.limitDate ? new Date(options.limitDate) : new Date(0);
 
     while (true) {
         const response: UserPlayedGamesResponse = await getUserPlayedGames(auth, accountId, {
-            limit: pageSize,
+            limit: DEFAULT_PLAYED_GAMES_PAGE_SIZE,
             offset: offset,
             categories: 'ps4_game,ps5_native_game,pspc_game'
         });

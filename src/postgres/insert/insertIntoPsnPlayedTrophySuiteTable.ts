@@ -1,11 +1,11 @@
 import {PoolClient} from "pg";
 import {buildPostgresInsertPlaceholders} from "../utils/buildPostgresInsertPlaceholders.js";
 import {computePlayerUuid, computeTrophySuiteUuid} from "../../uuid/uuid.js";
-import {UserPlayedTrophySuite} from "../../models/UserPlayedTrophySuite.js";
+import {PlayedTrophySuite} from "../../models/PlayedTrophySuite.js";
 
 export async function insertIntoPsnPlayedTrophySuiteTable(
     client: PoolClient,
-    playedTrophySuites: UserPlayedTrophySuite[]
+    playedTrophySuites: PlayedTrophySuite[]
 ) {
     if (playedTrophySuites.length === 0) {
         console.warn("No data to insert into app.psn_played_trophy_suite table.");

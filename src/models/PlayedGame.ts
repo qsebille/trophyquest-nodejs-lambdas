@@ -1,6 +1,6 @@
 import {Game} from "./Game.js";
 
-export interface UserPlayedGame {
+export interface PlayedGame {
     game: Game,
     playerId: string,
     firstPlayedAt: string,
