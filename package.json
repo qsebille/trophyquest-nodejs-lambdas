@@ -1,13 +1,11 @@
 {
   "name": "trophyquest-psn-fetcher",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start-fetcher": "tsx src/runFetcher.ts",
-    "start-refresher": "tsx src/runRefresher.ts",
-    "start-remover": "tsx src/runRemover.ts",
-    "start-image-uploader": "tsx src/runImageUploader.ts",
+    "start-fetcher": "tsx src/fetcher.ts",
+    "start-refresher": "tsx src/refresher.ts",
     "test": "tsx --test"
   },
   "dependencies": {
